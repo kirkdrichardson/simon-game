@@ -1,0 +1,136 @@
+@font-face {
+  font-family: Digital;
+  src: url(./font.ttf);
+}
+
+.game-container {
+  border: solid 15px #0C001E;
+  height: 600px;
+  width: 600px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: center;
+  background-color: #0C001E;
+  border-radius: 40%;
+  position: absolute;
+  box-shadow: 2px 2px 5px #666;
+}
+
+.colored-div {
+  height: 260px;
+  width: 260px;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+#red {
+  border-top-left-radius: 80%;
+  background-color: #D13045;
+}
+#green {
+  border-top-right-radius: 80%;
+  background-color: #51BC0F;
+}
+#blue {
+  border-bottom-left-radius: 80%;
+  background-color: #31AFEA;
+}
+#yellow {
+  border-bottom-right-radius: 80%;
+  background-color: #EAD746;
+}
+
+#control {
+  position: absolute;
+  z-index: 2;
+  background-color: #E0D2BC;
+  height: 320px;
+  width: 320px;
+  border-radius: 40%;
+  border: solid 30px #0C001E;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+#title {
+  font-family: cursive, sans-serif;
+  font-size: 56px;
+  margin-bottom: 10px;
+  margin-top: 15px;
+}
+
+#count {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #0C001E;
+  height: 90px;
+  width: 150px;
+  border-radius: 15%;
+  font-size: 78px;
+  font-weight: bold;
+  color: #D13045;
+  font-family: 'Digital','Orbitron', sans-serif;
+  border: solid 5px gray;
+  padding-bottom: 10px;
+  box-shadow: 1px 1px 5px #888888;
+}
+
+#start-btn {
+  height: 30px;
+  width: 30px;
+  margin-top: 8px;
+  border-radius: 50%;
+  border: solid 5px black;
+  background-color: #D13045;
+  box-shadow: 2px 2px 3px #888888;
+}
+
+#strict-btn {
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  border: solid 5px black;
+  background-color: #EAD746;
+  box-shadow: 2px 2px 3px #888888;
+}
+
+
+.btn-text {
+  font-family: cursive, sans-serif;
+}
+
+#btns-container {
+  display: flex;
+  padding: 20px;
+  margin-left: 20px;
+}
+
+#start-btn-container {
+  display: flex;
+  flex-direction: column;
+  margin: 0 45px 0 0;
+  line-height: 1px;
+}
+
+#strict-btn-container {
+  display: flex;
+  flex-direction: column;
+  margin-left: 45px;
+  line-height: 1px;
+}
+
+#strict-light {
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  background-color: #0C001E;
+  margin: 0 0 0 40px;
+  border: solid .9px black;
+  box-shadow: 1px 1px 1px #888888;
+}
