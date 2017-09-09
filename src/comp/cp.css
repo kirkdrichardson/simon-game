@@ -91,6 +91,12 @@
   box-shadow: 2px 2px 3px #888888;
 }
 
+#start-btn:hover {
+  background-color: #BA1A3C;
+  box-shadow: 0 2px #666;
+  transform: translateY(1px);
+}
+
 #strict-btn {
   height: 30px;
   width: 30px;
@@ -98,6 +104,12 @@
   border: solid 5px black;
   background-color: #EAD746;
   box-shadow: 2px 2px 3px #888888;
+}
+
+#strict-btn:hover {
+  background-color: #DDCB42;
+  box-shadow: 0 2px #666;
+  transform: translateY(1px);
 }
 
 
