@@ -30,17 +30,44 @@
   border-top-left-radius: 80%;
   background-color: #D13045;
 }
+
+#red:active {
+  background-color: #BA1A3C;
+  box-shadow: 0 2px #666;
+  transform: translateY(1px);
+}
+
 #green {
   border-top-right-radius: 80%;
   background-color: #51BC0F;
 }
+
+#green:active {
+  background-color: #4CAF0E;
+  box-shadow: 0 2px #666;
+  transform: translateY(1px);
+}
+
 #blue {
   border-bottom-left-radius: 80%;
   background-color: #31AFEA;
 }
+
+#blue:active {
+  background-color: #2DA2D8;
+  box-shadow: 0 2px #666;
+  transform: translateY(1px);
+}
+
 #yellow {
   border-bottom-right-radius: 80%;
   background-color: #EAD746;
+}
+
+#yellow:active {
+  background-color: #DDCB42;
+  box-shadow: 0 2px #666;
+  transform: translateY(1px);
 }
 
 #control {

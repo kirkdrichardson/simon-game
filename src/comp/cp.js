@@ -25,8 +25,17 @@ class ControlPanel extends Component {
   }
 
   toggleColor = (event) => {
-    console.log(event.target.id)
+    const soundMap = {
+      red: "https://s3.amazonaws.com/freecodecamp/simonSound1.mp3",
+      green: "https://s3.amazonaws.com/freecodecamp/simonSound2.mp3",
+      blue: "https://s3.amazonaws.com/freecodecamp/simonSound4.mp3",
+      yellow: "https://s3.amazonaws.com/freecodecamp/simonSound3.mp3"
+    };
+    const color = event.target.id;
+    const audioObj = new Audio(soundMap[color]);
+    audioObj.play();
   }
+
 
   render() {
     const strictLight = {backgroundColor: '#0C001E'};
