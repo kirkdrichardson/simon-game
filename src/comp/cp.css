@@ -3,6 +3,26 @@
   src: url(./font.ttf);
 }
 
+.game-prompt-container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  position: absolute;
+  border: solid coral;
+  height: 700px;
+  width: 700px;
+}
+
+.prompt {
+  position: relative;
+  bottom: 0;
+  color: white;
+  font-size: 36px;
+  font-weight: bold;
+  margin: 10px 0;
+  padding: 0;
+}
+
 .game-container {
   border: solid 15px #0C001E;
   height: 600px;
@@ -13,7 +33,7 @@
   align-items: center;
   background-color: #0C001E;
   border-radius: 40%;
-  position: absolute;
+  position: relative;
   box-shadow: 2px 2px 5px #666;
 }
 
