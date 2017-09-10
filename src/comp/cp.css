@@ -8,7 +8,6 @@
   align-items: center;
   flex-direction: column;
   position: absolute;
-  border: solid coral;
   height: 700px;
   width: 700px;
 }
@@ -17,10 +16,11 @@
   position: relative;
   bottom: 0;
   color: white;
-  font-size: 36px;
+  font-size: 24px;
   font-weight: bold;
-  margin: 10px 0;
+  margin: 20px 0;
   padding: 0;
+  font-family: 'Ubuntu', sans-serif;
 }
 
 .game-container {
@@ -105,10 +105,10 @@
 }
 
 #title {
-  font-family: cursive, sans-serif;
-  font-size: 56px;
+  font-family: 'Gravitas One', 'Orbitron', cursive, sans-serif;
+  font-size: 50px;
   margin-bottom: 10px;
-  margin-top: 15px;
+  margin-top: 20px;
 }
 
 #count {
