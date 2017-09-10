@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import './cp.css';
 
-const Prompt = () => {
+const Prompt = (props) => {
   return (
-    <p className='prompt'>Hello</p>
+    <p className='prompt'>{props.prompt}</p>
   );
 }
 
@@ -19,7 +19,8 @@ class ControlPanel extends Component {
       sequenceArr: [],
       userPlay: 0,
       replay: false,
-      gameOver: false
+      gameOver: false,
+      prompt: 'Press start to begin'
     }
   }
 
@@ -55,12 +56,12 @@ class ControlPanel extends Component {
     this.setState({
       count: '--',
       started: false,
-      strictMode: false,
       userTurn: false,
       sequenceArr: [],
       userPlay: 0,
       replay: false,
-      gameOver: false
+      gameOver: false,
+      prompt: 'Press start to begin'
     });
   }
 
@@ -79,19 +80,22 @@ class ControlPanel extends Component {
   /* control buttons */
   toggleStrict = () => {
     this.setState({
-      strictMode: !this.state.strictMode
+      strictMode: !this.state.strictMode,
     });
   }
 
   toggleStart = () => {
     this.resetBoard();
     const count = !this.state.started ? 1 : '--'
+    const prompt = !this.state.started ? 'Get 20 in a row to win!' : 'Press start to begin'
     this.setState({
       count: count,
       started: !this.state.started,
       userTurn: false,
-      sequenceArr: []
+      sequenceArr: [],
+      prompt: prompt
     });
+    setTimeout(() => this.setState({prompt: ''}), 3000);
   }
 
 /* computer logic */
@@ -173,7 +177,12 @@ flashColorsOnReset = () => {
         // reset state & start at one
         if (this.state.strictMode) {
           this.resetBoard();
-          this.setState({ count: 0, started: true });
+          this.setState({
+            count: 0,
+            started: true,
+            prompt: "To prevent restarting, turn strict mode off",
+          });
+          setTimeout(() => this.setState({ prompt: '' }), 5000);
         }
 
         // if strictMode off, turn on replay, set user play to 0, and let computer move
@@ -241,7 +250,7 @@ flashColorsOnReset = () => {
 
       </div>
 
-      <Prompt />
+      <Prompt prompt={this.state.prompt}/>
       </div>
     );
   }
