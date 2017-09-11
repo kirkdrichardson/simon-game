@@ -27,12 +27,30 @@ class ControlPanel extends Component {
   componentDidUpdate() {
     // user wins game if 20 steps completed
     if (this.state.count === 21) {
-      this.setState({ gameOver: true, count: 'win!' });
+      this.setState({
+        gameOver: true,
+        count: 'win!',
+        prompt: 'You broke the machine!'
+      });
+
+      // loop success sound
       const gameWinSound = new Audio(this.soundMap.correct);
       gameWinSound.loop = true
       gameWinSound.play();
-      setTimeout(() => gameWinSound.loop = false, 2000);
-      this.flashColorsOnReset();
+      setTimeout(() => gameWinSound.loop = false, 5000);
+
+      // loop flashing lights
+      let cnt = 0
+      const id = setInterval(() => {
+        if (cnt === 5) {
+          clearInterval(id);
+          this.resetBoard();
+        }
+        else
+          this.flashColorsOnReset();
+        cnt++;
+      }, 900);
+
     }
 
     // check if computer's turn
@@ -73,7 +91,7 @@ class ControlPanel extends Component {
     blue: "https://s3.amazonaws.com/freecodecamp/simonSound4.mp3",
     yellow: "https://s3.amazonaws.com/freecodecamp/simonSound3.mp3",
     correct: "http://freesound.org/people/suntemple/sounds/253177/download/253177__suntemple__retro-accomplished-sfx.wav",
-    incorrect: "http://freesound.org/people/themusicalnomad/sounds/253886/download/253886__themusicalnomad__negative-beeps.wav"
+    incorrect: "https://freesound.org/people/myfox14/sounds/382310/download/382310__myfox14__game-over-arcade.wav"
   };
 
 
@@ -168,32 +186,41 @@ flashColorsOnReset = () => {
 
       // if user toggles incorrectly
       if (color !== this.state.sequenceArr[this.state.userPlay]) {
+        let cnt = 0;
+        const id = setInterval(() => {
+          if (cnt === 2) {
+            clearInterval(id);
 
-        // flash colors & play failure sound in every case
-        this.flashColorsOnReset();
-        const failureSound = new Audio(this.soundMap.incorrect);
-        failureSound.play();
+            // reset state & start at one
+            if (this.state.strictMode) {
+              this.resetBoard();
+              this.setState({
+                count: 0,
+                started: true,
+                prompt: "To prevent restarting, turn strict mode off",
+              });
+              setTimeout(() => this.setState({ prompt: '' }), 5000);
+            }
 
-        // reset state & start at one
-        if (this.state.strictMode) {
-          this.resetBoard();
-          this.setState({
-            count: 0,
-            started: true,
-            prompt: "To prevent restarting, turn strict mode off",
-          });
-          setTimeout(() => this.setState({ prompt: '' }), 5000);
-        }
+            // if strictMode off, turn on replay, set user play to 0, and let computer move
+            else {
+              this.setState({
+                replay: true,
+                userPlay: 0,
+                userTurn: false
+              })
+            }
+          }
+          else {
+            // flash colors & play failure sound in every case
+            this.flashColorsOnReset();
+            const failureSound = new Audio(this.soundMap.incorrect);
+            failureSound.play();
+          }
 
-        // if strictMode off, turn on replay, set user play to 0, and let computer move
-        else {
-          this.setState({
-            replay: true,
-            userPlay: 0,
-            userTurn: false
-          })
-        }
+        cnt++;
 
+        }, 900);
 
       }
       // if user plays correct color, play sound & add 1 to userPlay (used to evaluate the next index of sequenceArr)
@@ -255,15 +282,6 @@ flashColorsOnReset = () => {
     );
   }
 }
-
-
-
-
-
-
-
-
-
 
 
 
