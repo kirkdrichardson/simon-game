@@ -1,18 +1,22 @@
 import React, { Component } from 'react';
-import './App.css';
-import ControlPanel from './comp/cp.js'
+import styled from 'styled-components';
+import ControlPanel from './comp/ControlPanel.js'
 
-class App extends Component {
+export default class App extends Component {
   render() {
     return (
-      <div className="App">
-        <div className="container">
+      <Container>
         <ControlPanel />
-        </div>
-
-      </div>
+      </Container>
     );
   }
 }
 
-export default App;
+const Container = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  margin-top: 100px;
+`;
+
+

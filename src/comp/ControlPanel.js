@@ -237,7 +237,7 @@ flashColorsOnReset = () => {
       strictLight.backgroundColor = '#D13045';
 
     return (
-      <div className='game-prompt-container'>
+      <MainContainer>
       <div className='game-container'>
         <div id='control'>
           <h1 id='title'>Simon</h1>
@@ -263,7 +263,7 @@ flashColorsOnReset = () => {
         <div
           id='green'
           className='colored-div green'
-          onClick={this.handleUserMove}></div>
+          onClick={this.handleUserMove}></P>
 
         <div
           id='blue'
@@ -278,11 +278,20 @@ flashColorsOnReset = () => {
       </div>
 
       <Prompt prompt={this.state.prompt}/>
-      </div>
+      </MainContainer>
     );
   }
 }
 
+
+const MainContainer = styled.div`
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  position: absolute;
+  height: 700px;
+  width: 700px;
+`;
 
 
 export default ControlPanel
