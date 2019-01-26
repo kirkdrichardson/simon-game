@@ -1,14 +1,9 @@
 import React, { Component } from 'react';
+import styled from 'styled-components';
 import './cp.css';
 
-const Prompt = (props) => {
-  return (
-    <p className='prompt'>{props.prompt}</p>
-  );
-}
 
-
-class ControlPanel extends Component {
+export default class ControlPanel extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -232,59 +227,61 @@ flashColorsOnReset = () => {
 
 
   render() {
-    const strictLight = {backgroundColor: '#0C001E'};
-    if (this.state.strictMode)
-      strictLight.backgroundColor = '#D13045';
+
+    const { count, strictMode, prompt } = this.state;
 
     return (
-      <MainContainer>
+      <div className='game-prompt-container'>
       <div className='game-container'>
-        <div id='control'>
-          <h1 id='title'>Simon</h1>
-          <div id='count'>{this.state.count}</div>
-          <div id='btns-container'>
-            <div id='start-btn-container'>
-              <div id='start-btn' onClick={this.toggleStart}></div>
-              <p className='btn-text'>Start</p>
-            </div>
-              <div id='strict-btn-container'>
-                <div id='strict-light' style={strictLight}></div>
-                <div id='strict-btn' onClick={this.toggleStrict}></div>
-                <p className='btn-text'>Strict</p>
-              </div>
-          </div>
-        </div>
 
-        <div
-          id='red'
+        <ScoreAndButtons>
+          <Title>Simon</Title>
+          <Count>{count}</Count>
+          <ControlButtons>
+            <ControlButtonContainer margin='0 45px 0 0'>
+              <ControlButton onClick={this.toggleStart} />
+              <ButtonText>Start</ButtonText>
+            </ControlButtonContainer>
+              <ControlButtonContainer>
+                <ButtonIndicatorLight on={strictMode} />
+                <ControlButton warning onClick={this.toggleStrict} />
+                <ButtonText>Strict</ButtonText>
+              </ControlButtonContainer>
+          </ControlButtons>
+        </ScoreAndButtons>
+
+
+        {/* {['red', 'green', 'blue', 'yellow'].map(b => <ColoredButton additionalStyle={b.style} onClick={this.handleUserMove} />)} */}
+
+
+
+        <ColoredButton
           className='colored-div red'
-          onClick={this.handleUserMove}></div>
+          onClick={this.handleUserMove} />
 
-        <div
-          id='green'
+        <ColoredButton
           className='colored-div green'
-          onClick={this.handleUserMove}></P>
+          onClick={this.handleUserMove} />
 
-        <div
-          id='blue'
+        <ColoredButton
           className='colored-div blue'
-          onClick={this.handleUserMove}></div>
+          onClick={this.handleUserMove} />
 
-        <div
-          id='yellow'
+        <ColoredButton
           className='colored-div yellow'
-          onClick={this.handleUserMove}></div>
+          onClick={this.handleUserMove} />
 
       </div>
 
-      <Prompt prompt={this.state.prompt}/>
-      </MainContainer>
+      <Prompt>{prompt}</Prompt>
+
+      </div>
     );
   }
 }
 
 
-const MainContainer = styled.div`
+const PromptContainer = styled.div`
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -294,4 +291,105 @@ const MainContainer = styled.div`
 `;
 
 
-export default ControlPanel
+const Title = styled.h1`
+  font-family: 'Gravitas One', 'Orbitron', cursive, sans-serif;
+  font-size: 50px;
+  margin-bottom: 10px;
+  margin-top: 20px;
+`;
+
+const Count = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #0C001E;
+  height: 90px;
+  width: 150px;
+  border-radius: 15%;
+  font-size: 78px;
+  font-weight: bold;
+  color: #D13045;
+  font-family: 'Digital','Orbitron', sans-serif;
+  border: solid 5px gray;
+  padding-bottom: 10px;
+  box-shadow: 1px 1px 5px #888888;
+`;
+
+
+
+const ScoreAndButtons = styled.div`
+  position: absolute;
+  z-index: 2;
+  background-color: #E0D2BC;
+  height: 320px;
+  width: 320px;
+  border-radius: 40%;
+  border: solid 30px #0C001E;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+`;
+
+const ControlButtons = styled.div`
+  display: flex;
+  padding: 20px;
+  margin-left: 20px;
+`;
+
+const ControlButtonContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin: ${props => props.margin ? props.margin : '0 0 0 45px'};
+  line-height: 1px;
+`;
+
+const ControlButton = styled.div`
+  height: 30px;
+  width: 30px;
+  margin-top: ${props => props.warning ? 0 : 8}px;
+  border-radius: 50%;
+  border: solid 5px black;
+  background-color:  ${props => props.warning ? '#EAD746' : '#D13045'};
+  box-shadow: 2px 2px 3px #888888;
+
+  :hover {
+    background-color: ${props => props.warning ? '#DDCB42' : '#BA1A3C'};
+    box-shadow: 0 2px #666;
+    transform: translateY(1px);
+  }
+`;
+
+const ButtonText = styled.p`
+  font-family: cursive, sans-serif;
+`;
+
+const ButtonIndicatorLight = styled.div`
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  background-color: ${props => props.on ? '#D13045' : '#0C001E'};
+  margin: 0 0 0 40px;
+  border: solid .9px black;
+  box-shadow: 1px 1px 1px #888888;
+`;
+
+const ColoredButton = styled.div`
+  height: 260px;
+  width: 260px;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+`;
+
+const Prompt = styled.p`
+  position: relative;
+  bottom: 0;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  margin: 20px 0;
+  padding: 0;
+  font-family: 'Ubuntu', sans-serif;
+`;
