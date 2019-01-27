@@ -1,8 +1,30 @@
-import React, { Component } from 'react';
+//@flow strict
+import * as React from 'react';
 import styled, { css } from 'styled-components';
 
+// sounds associated with each of the colors. Used in handleUserMove
+const soundMap = {
+  red: "https://s3.amazonaws.com/freecodecamp/simonSound1.mp3",
+  green: "https://s3.amazonaws.com/freecodecamp/simonSound2.mp3",
+  blue: "https://s3.amazonaws.com/freecodecamp/simonSound4.mp3",
+  yellow: "https://s3.amazonaws.com/freecodecamp/simonSound3.mp3",
+  correct: "http://freesound.org/people/suntemple/sounds/253177/download/253177__suntemple__retro-accomplished-sfx.wav",
+  incorrect: "https://freesound.org/people/myfox14/sounds/382310/download/382310__myfox14__game-over-arcade.wav"
+};
 
-export default class ControlPanel extends Component {
+type State = {
+  count: string,
+  started: boolean,
+  strictMode: boolean,
+  userTurn: boolean,
+  sequenceArray: string[],
+  userPlay: number,
+  replay: boolean,
+  gameOver: boolean,
+  prompt: string
+};
+
+export default class ControlPanel extends React.Component<{}, State> {
 
   state = {
       count: '--',
@@ -17,42 +39,26 @@ export default class ControlPanel extends Component {
     };
 
   componentDidUpdate() {
+    const {
+      count,
+      userPlay,
+      gameOver,
+      started
+    } = this.state;
+    
     // user wins game if 20 steps completed
-    if (this.state.count === 21) {
-      this.setState({
-        gameOver: true,
-        count: 'win!',
-        prompt: 'You broke the machine!'
-      });
-
-      // loop success sound
-      const gameWinSound = new Audio(this.soundMap.correct);
-      gameWinSound.loop = true
-      gameWinSound.play();
-      setTimeout(() => gameWinSound.loop = false, 5000);
-
-      // loop flashing lights
-      let cnt = 0
-      const id = setInterval(() => {
-        if (cnt === 5) {
-          clearInterval(id);
-          this.resetBoard();
-        }
-        else
-          this.flashColorsOnReset();
-        cnt++;
-      }, 900);
-
+    if (count === 21) {
+      this.onGameWin();
     }
 
     // check if computer's turn
-    if (this.state.started && !this.state.userTurn && !this.state.gameOver) {
+    if (started && !userTurn && !gameOver) {
       setTimeout(this.computerTurn, 1000);
     }
 
     // modify count & play success sound if the user has played all colors in sequence & game not over
-    if (this.state.count === this.state.userPlay && !this.state.gameOver) {
-      const successSound = new Audio(this.soundMap.correct);
+    if (count === userPlay && !gameOver) {
+      const successSound = new Audio(soundmap.correct);
       successSound.play();
 
       this.setState({
@@ -62,32 +68,8 @@ export default class ControlPanel extends Component {
     }
   }
 
-  resetBoard = () => {
-    this.setState({
-      count: '--',
-      started: false,
-      userTurn: false,
-      sequenceArr: [],
-      userPlay: 0,
-      replay: false,
-      gameOver: false,
-      prompt: 'Press start to begin'
-    });
-  }
 
-
-  // sounds for each of the colors. Used in handleUserMove
-  soundMap = {
-    red: "https://s3.amazonaws.com/freecodecamp/simonSound1.mp3",
-    green: "https://s3.amazonaws.com/freecodecamp/simonSound2.mp3",
-    blue: "https://s3.amazonaws.com/freecodecamp/simonSound4.mp3",
-    yellow: "https://s3.amazonaws.com/freecodecamp/simonSound3.mp3",
-    correct: "http://freesound.org/people/suntemple/sounds/253177/download/253177__suntemple__retro-accomplished-sfx.wav",
-    incorrect: "https://freesound.org/people/myfox14/sounds/382310/download/382310__myfox14__game-over-arcade.wav"
-  };
-
-
-  /* control buttons */
+  /********************   GAME CONTROL FUNCTION   ********************/
   toggleStrict = () => {
     this.setState({
       strictMode: !this.state.strictMode,
@@ -108,7 +90,65 @@ export default class ControlPanel extends Component {
     setTimeout(() => this.setState({prompt: ''}), 3000);
   }
 
-/* computer logic */
+  /********************   GAME EVENT LOGIC   ********************/
+
+  resetBoard = () => {
+    this.setState({
+      count: '--',
+      started: false,
+      userTurn: false,
+      sequenceArr: [],
+      userPlay: 0,
+      replay: false,
+      gameOver: false,
+      prompt: 'Press start to begin'
+    });
+  }
+
+  onGameWin = () => {
+    this.setState({
+      gameOver: true,
+      count: 'win!',
+      prompt: 'You broke the machine!'
+    });
+
+    // loop success sound
+    const gameWinSound = new Audio(soundmap.correct);
+    gameWinSound.loop = true
+    gameWinSound.play();
+    setTimeout(() => gameWinSound.loop = false, 5000);
+
+    // loop flashing lights
+    let cnt = 0
+    const id = setInterval(() => {
+      if (cnt === 5) {
+        clearInterval(id);
+        this.resetBoard();
+      }
+      else
+        this.flashColorsOnReset();
+      cnt++;
+    }, 900);
+  }
+
+  flashColorsOnReset = () => {
+    const colors = ["red", "green", "yellow", "blue"];
+    for (let i = 0; i < colors.length; i++) {
+      let color = colors[i];
+      this.simulateClick(document.getElementById(color), color);
+    }
+  }
+
+
+  // toggle class to simulate a user click
+  simulateClick = (elem, color) => {
+    const colorMap = {red: '#FF93A2', green: '#7EFF2D', yellow: '#FFFCE0', blue: '#7CD5FF' }
+    elem.style.backgroundColor = colorMap[color];
+    setTimeout(() => {elem.style.backgroundColor = ''}, 600);
+  }
+
+
+  /********************   GAME SIMULATION LOGIC   ********************/
 
 computerTurn = () => {
   // only run if a single new color hasn't yet been added to the sequence
@@ -123,14 +163,12 @@ computerTurn = () => {
         sequence.forEach(function(color, i) {
           setTimeout(function() {
             let element = document.getElementById(color);
-            let audioObj = new Audio(this.soundMap[color]);
+            let audioObj = new Audio(soundmap[color]);
             this.simulateClick(element, color);
             audioObj.play();
           }.bind(this), i * 700);
         }, this);
     }
-
-
 
     const endingCallback = () => {
       iterateOverSequence(this.state.sequenceArr)
@@ -148,36 +186,27 @@ computerTurn = () => {
 }
 
 
-
-// toggle class to simulate a user click
-simulateClick = (elem, color) => {
-  const colorMap = {red: '#FF93A2', green: '#7EFF2D', yellow: '#FFFCE0', blue: '#7CD5FF' }
-  elem.style.backgroundColor = colorMap[color];
-  setTimeout(() => {elem.style.backgroundColor = ''}, 600);
-}
-
-
-
-flashColorsOnReset = () => {
-  const colors = ["red", "green", "yellow", "blue"];
-  for (let i = 0; i < colors.length; i++) {
-    let color = colors[i];
-    this.simulateClick(document.getElementById(color), color);
-  }
-}
-
-
   handleUserMove = (event) => {
 
-    if (this.state.started && this.state.userTurn) {
+    const {
+      started,
+      userTurn,
+      sequenceArr,
+      strictMode
+    } = this.state;
 
+    if (started && userTurn) {
+
+      // TODO - change to a non-DOM paradigm
       // play sound on button press
       const color = event.target.id;
-      const audioObj = new Audio(this.soundMap[color]);
+
+      const audioObj = new Audio(soundmap[color]);
       audioObj.play();
 
+
       // if user toggles incorrectly
-      if (color !== this.state.sequenceArr[this.state.userPlay]) {
+      if (color !== sequenceArr[this.state.userPlay]) {
         let cnt = 0;
         const id = setInterval(() => {
           if (cnt === 2) {
@@ -206,7 +235,7 @@ flashColorsOnReset = () => {
           else {
             // flash colors & play failure sound in every case
             this.flashColorsOnReset();
-            const failureSound = new Audio(this.soundMap.incorrect);
+            const failureSound = new Audio(soundmap.incorrect);
             failureSound.play();
           }
 
@@ -217,7 +246,7 @@ flashColorsOnReset = () => {
       }
       // if user plays correct color, play sound & add 1 to userPlay (used to evaluate the next index of sequenceArr)
       else {
-        this.setState({ userPlay: this.state.userPlay + 1 });
+        this.setState((prevState) => ({ userPlay: prevState.userPlay + 1 }));
       }
     }
   }
