@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
-import styled from 'styled-components';
-import './cp.css';
+import styled, { css } from 'styled-components';
 
 
 export default class ControlPanel extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
+
+  state = {
       count: '--',
       started: false,
       strictMode: false,
@@ -16,8 +14,7 @@ export default class ControlPanel extends Component {
       replay: false,
       gameOver: false,
       prompt: 'Press start to begin'
-    }
-  }
+    };
 
   componentDidUpdate() {
     // user wins game if 20 steps completed
@@ -231,9 +228,8 @@ flashColorsOnReset = () => {
     const { count, strictMode, prompt } = this.state;
 
     return (
-      <div className='game-prompt-container'>
-      <div className='game-container'>
-
+      <MainContainer>
+      <GameWrapper>
         <ScoreAndButtons>
           <Title>Simon</Title>
           <Count>{count}</Count>
@@ -249,39 +245,20 @@ flashColorsOnReset = () => {
               </ControlButtonContainer>
           </ControlButtons>
         </ScoreAndButtons>
-
-
-        {/* {['red', 'green', 'blue', 'yellow'].map(b => <ColoredButton additionalStyle={b.style} onClick={this.handleUserMove} />)} */}
-
-
-
-        <ColoredButton
-          className='colored-div red'
-          onClick={this.handleUserMove} />
-
-        <ColoredButton
-          className='colored-div green'
-          onClick={this.handleUserMove} />
-
-        <ColoredButton
-          className='colored-div blue'
-          onClick={this.handleUserMove} />
-
-        <ColoredButton
-          className='colored-div yellow'
-          onClick={this.handleUserMove} />
-
-      </div>
-
+        {['red', 'green', 'blue', 'yellow'].map(t =>
+          <ColoredButton type={t} onClick={this.handleUserMove} />
+        )}
+      </GameWrapper>
       <Prompt>{prompt}</Prompt>
-
-      </div>
+      </MainContainer>
     );
   }
 }
 
 
-const PromptContainer = styled.div`
+// style
+
+const MainContainer = styled.div`
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -290,6 +267,19 @@ const PromptContainer = styled.div`
   width: 700px;
 `;
 
+const GameWrapper = styled.div`
+  border: solid 15px #0C001E;
+  height: 600px;
+  width: 600px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: center;
+  background-color: #0C001E;
+  border-radius: 40%;
+  position: relative;
+  box-shadow: 2px 2px 5px #666;
+`;
 
 const Title = styled.h1`
   font-family: 'Gravitas One', 'Orbitron', cursive, sans-serif;
@@ -314,8 +304,6 @@ const Count = styled.div`
   padding-bottom: 10px;
   box-shadow: 1px 1px 5px #888888;
 `;
-
-
 
 const ScoreAndButtons = styled.div`
   position: absolute;
@@ -381,6 +369,52 @@ const ColoredButton = styled.div`
   overflow: hidden;
   position: relative;
   z-index: 1;
+
+  ${props => {
+    switch(props.type) {
+      case 'red':
+        return css`
+          border-top-left-radius: 80%;
+          background-color: #D13045;
+          :active {
+            background-color: #BA1A3C;
+            box-shadow: 0 2px #666;
+            transform: translateY(1px);
+          }
+        `;
+        case 'green':
+          return css`
+            border-top-right-radius: 80%;
+            background-color: #51BC0F;
+            :active {
+              background-color: #4CAF0E;
+              box-shadow: 0 2px #666;
+              transform: translateY(1px);
+            }
+          `;
+        case 'blue':
+            return css`
+              border-bottom-left-radius: 80%;
+              background-color: #31AFEA;
+              :active {
+                background-color: #2DA2D8;
+                box-shadow: 0 2px #666;
+                transform: translateY(1px); 
+              }
+            `;
+        case 'yellow':
+            return css`
+              border-bottom-right-radius: 80%;
+              background-color: #EAD746;
+              :active {
+                background-color: #DDCB42;
+                box-shadow: 0 2px #666;
+                transform: translateY(1px);
+              }
+            `;
+        }
+    }
+  }
 `;
 
 const Prompt = styled.p`
