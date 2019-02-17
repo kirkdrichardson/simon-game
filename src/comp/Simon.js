@@ -450,7 +450,7 @@ const ControlButton = styled.div`
 `;
 
 const ButtonText = styled.p`
-  font-family: cursive, sans-serif;
+  font-family: sans-serif;
 `;
 
 const ButtonIndicatorLight = styled.div`
