@@ -49,7 +49,7 @@ const log = (...args) => {
   }
 }
 
-export default class ControlPanel extends React.Component<{}, State> {
+export default class Game extends React.Component<{}, State> {
   state = {
     count: 0,
     started: false,
