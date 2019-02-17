@@ -29,7 +29,7 @@ const ColorTypeKeys: ColorType[] = Object.keys(ColorMap);
 const ActiveColorMap = (() => {
   const activeColorMap = {};
   ColorTypeKeys.forEach(key => {
-    activeColorMap[key] = lighten(0.2, ColorMap[key]);
+    activeColorMap[key] = lighten(0.35, ColorMap[key]);
   });
 
   return activeColorMap;
@@ -48,10 +48,10 @@ type State = {
   prompt: string
 };
 
-const WIN_THRESHOLD: number = 5;
+const WIN_THRESHOLD: number = 21;
 const TURN_DELAY: number = 1000;
 
-const DEBUG = true;
+const DEBUG = false;
 
 const log = (...args) => {
   if (DEBUG) {
@@ -60,6 +60,7 @@ const log = (...args) => {
 };
 
 export default class Simon extends React.Component<{}, State> {
+  // TODO - replace game state booleans with enums to reduce async complication
   state = {
     count: 0,
     started: false,
@@ -85,7 +86,7 @@ export default class Simon extends React.Component<{}, State> {
     `);
 
     // user wins game if 20 steps completed
-    if (count === WIN_THRESHOLD) {
+    if (!gameOver && count === WIN_THRESHOLD) {
       this.onGameWin();
     }
 
