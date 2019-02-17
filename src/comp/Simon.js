@@ -59,6 +59,11 @@ const log = (...args) => {
   }
 };
 
+// TODO - when computer is playing a sequence,
+// the interval ids of each method pushed to the call stack should
+// be stashed in an array to be looped and cleared if something interrupts
+// the computer's turn
+
 export default class Simon extends React.Component<{}, State> {
   // TODO - replace game state booleans with enums to reduce async complication
   state = {
@@ -147,6 +152,7 @@ export default class Simon extends React.Component<{}, State> {
         userPlay: 0,
         replaying: false,
         gameOver: false,
+        win: false,
         prompt: "Press start to begin"
       },
       cb
@@ -248,10 +254,10 @@ export default class Simon extends React.Component<{}, State> {
   };
 
   handleUserMove = (evt: SyntheticEvent<HTMLButtonElement>) => {
-    const { started, userTurn, sequenceArr, strictMode, userPlay } = this.state;
+    const { started, userTurn, sequenceArr, strictMode, userPlay, replaying } = this.state;
     const t: HTMLButtonElement = evt.currentTarget; // https://flow.org/en/docs/react/events/
 
-    if (started && userTurn) {
+    if (started && userTurn && !replaying) {
       // TODO - change to a non-DOM paradigm
       // play sound on button press
       const color = t.id;
