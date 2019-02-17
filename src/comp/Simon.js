@@ -1,5 +1,6 @@
 //@flow strict
 import * as React from "react";
+import { lighten } from 'polished';
 import styled, { css } from "styled-components";
 
 // sounds associated with each of the colors. Used in handleUserMove
@@ -15,15 +16,26 @@ const SoundMap: { [string]: string } = {
 };
 
 const ColorMap = {
-  red: "#FF93A2",
-  green: "#7EFF2D",
-  blue: "#7CD5FF",
-  yellow: "#FFFCE0"
+  red: "#d13045",
+  green: "#51bc0f",
+  blue: "#31afea",
+  yellow: "#ead746"
 };
 
 type ColorType = $Keys<typeof ColorMap>;
 
-const ColorValues: ColorType[] = Object.keys(ColorMap);
+// union type of ColorMap keys - used to type IDs of button elements & pass styled compnent props
+const ColorTypeKeys: ColorType[] = Object.keys(ColorMap);
+
+// factory to generate a new color map of lighter colors
+const ActiveColorMap = (() => {
+  const activeColorMap = {};
+  ColorTypeKeys.forEach(key => {
+    activeColorMap[key] = lighten(0.2, ColorMap[key]);
+  });
+
+  return activeColorMap;
+})();
 
 type State = {
   count: number,
@@ -39,7 +51,7 @@ type State = {
 };
 
 const WIN_THRESHOLD: number = 5;
-const TURN_DELAY: number = 500;
+const TURN_DELAY: number = 1000;
 
 const DEBUG = true;
 
@@ -164,8 +176,8 @@ export default class Simon extends React.Component<{}, State> {
   };
 
   flashColorsOnReset = (): void => {
-    for (let i = 0; i < ColorValues.length; i++) {
-      const color = ColorValues[i];
+    for (let i = 0; i < ColorTypeKeys.length; i++) {
+      const color = ColorTypeKeys[i];
       this.simulateClick(document.getElementById(color), color, true);
     }
   };
@@ -178,7 +190,7 @@ export default class Simon extends React.Component<{}, State> {
         let audioObj: HTMLAudioElement = new window.Audio(SoundMap[color]);
         audioObj.play();
       }
-      elem.style.backgroundColor = ColorMap[color];
+      elem.style.backgroundColor = ActiveColorMap[color];
       setTimeout(() => {
         elem.style.backgroundColor = "";
       }, 600);
@@ -195,7 +207,7 @@ export default class Simon extends React.Component<{}, State> {
     // only run if a single new color hasn't yet been added to the sequence
     // count will be updated after user moves correctly
     if (count > sequenceArr.length || replaying) {
-      const randomColor = () => ColorValues[Math.floor(Math.random() * 4)];
+      const randomColor = () => ColorTypeKeys[Math.floor(Math.random() * 4)];
       // if replaying, reuse sequence, else add new color to end
       let sequence = replaying ? sequenceArr : sequenceArr.slice().concat(randomColor());
 
@@ -313,7 +325,7 @@ export default class Simon extends React.Component<{}, State> {
               </ControlButtonContainer>
             </ControlButtons>
           </ScoreAndButtons>
-          {ColorValues.map(t => (
+          {ColorTypeKeys.map(t => (
             <ColoredButton key={t} type={t} id={t} onClick={this.handleUserMove} />
           ))}
         </GameWrapper>
@@ -444,9 +456,9 @@ const ColoredButton = styled.button`
       case "red":
         return css`
           border-top-left-radius: 80%;
-          background-color: #d13045;
+          background-color: ${ColorMap[props.type]};
           :active {
-            background-color: #ba1a3c;
+            background-color:${ActiveColorMap[props.type]};
             box-shadow: 0 2px #666;
             transform: translateY(1px);
           }
@@ -454,9 +466,9 @@ const ColoredButton = styled.button`
       case "green":
         return css`
           border-top-right-radius: 80%;
-          background-color: #51bc0f;
+          background-color: ${ColorMap[props.type]};
           :active {
-            background-color: #4caf0e;
+            background-color:${ActiveColorMap[props.type]};
             box-shadow: 0 2px #666;
             transform: translateY(1px);
           }
@@ -464,9 +476,9 @@ const ColoredButton = styled.button`
       case "blue":
         return css`
           border-bottom-left-radius: 80%;
-          background-color: #31afea;
+          background-color: ${ColorMap[props.type]};
           :active {
-            background-color: #2da2d8;
+            background-color:${ActiveColorMap[props.type]};
             box-shadow: 0 2px #666;
             transform: translateY(1px);
           }
@@ -474,9 +486,9 @@ const ColoredButton = styled.button`
       case "yellow":
         return css`
           border-bottom-right-radius: 80%;
-          background-color: #ead746;
+          background-color: ${ColorMap[props.type]};
           :active {
-            background-color: #ddcb42;
+            background-color:${ActiveColorMap[props.type]};
             box-shadow: 0 2px #666;
             transform: translateY(1px);
           }
