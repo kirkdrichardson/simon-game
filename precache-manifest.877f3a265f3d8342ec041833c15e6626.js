@@ -4,7 +4,7 @@ self.__precacheManifest = [
     "url": "/simon-game/static/media/green.c3c86e71.mp3"
   },
   {
-    "revision": "bd3f4e66152b2ece5285",
+    "revision": "ce6722c0fa1933a8ddef",
     "url": "/simon-game/static/css/main.8188e098.chunk.css"
   },
   {
@@ -24,8 +24,8 @@ self.__precacheManifest = [
     "url": "/simon-game/static/media/red.319c7710.mp3"
   },
   {
-    "revision": "bd3f4e66152b2ece5285",
-    "url": "/simon-game/static/js/main.bd3f4e66.chunk.js"
+    "revision": "ce6722c0fa1933a8ddef",
+    "url": "/simon-game/static/js/main.ce6722c0.chunk.js"
   },
   {
     "revision": "f4a912ee52e2c884a80499208c5568cc",
@@ -44,7 +44,7 @@ self.__precacheManifest = [
     "url": "/simon-game/static/media/failure.f768a2ef.wav"
   },
   {
-    "revision": "de8c749b13195ca53810aeee2c89fa7c",
+    "revision": "bdd4f3e3e422870a6b269fe2ec44db39",
     "url": "/simon-game/index.html"
   }
 ];
