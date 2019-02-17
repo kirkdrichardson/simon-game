@@ -32,13 +32,22 @@ type State = {
   win: boolean,
   strictMode: boolean,
   userTurn: boolean,
-  sequenceArr: string[],
+  sequenceArr: ColorType[],
   userPlay: number,
   replaying: boolean,
   prompt: string
 };
 
 const WIN_THRESHOLD: number = 5;
+const TURN_DELAY: number = 500;
+
+const DEBUG = true;
+
+const log = (...args) => {
+  if (DEBUG) {
+    console.log(...args);
+  }
+}
 
 export default class ControlPanel extends React.Component<{}, State> {
   state = {
@@ -57,6 +66,14 @@ export default class ControlPanel extends React.Component<{}, State> {
   componentDidUpdate() {
     const { count, userPlay, gameOver, started, userTurn } = this.state;
 
+    log(`ComponentDidMount():
+      count: ${count}, 
+      userPlay: ${userPlay}, 
+      gameOver: ${String(gameOver)},
+      started: ${String(started)},
+      userTurn: ${String(started)}
+    `);
+
     // user wins game if 20 steps completed
     if (count === WIN_THRESHOLD) {
       this.onGameWin();
@@ -64,7 +81,9 @@ export default class ControlPanel extends React.Component<{}, State> {
 
     // check if computer's turn
     if (started && !userTurn && !gameOver) {
-      setTimeout(this.computerTurn, 1000);
+      console.log(`Computer turn pushed to call stack with ${TURN_DELAY}ms delay`);
+      // setTimeout(this.computerTurn, TURN_DELAY);
+      this.computerTurn();
     }
 
     // modify count & play success sound if the user has played all colors in sequence & game not over
@@ -72,10 +91,10 @@ export default class ControlPanel extends React.Component<{}, State> {
       const successSound = new window.Audio(SoundMap.correct);
       successSound.play();
 
-      this.setState({
-        count: this.state.count + 1,
+      this.setState(prevState => ({
+        count: prevState.count + 1,
         userTurn: false
-      });
+      }));
     }
   }
 
@@ -86,17 +105,14 @@ export default class ControlPanel extends React.Component<{}, State> {
 
   toggleStart = () => {
     this.resetBoard(() => {
-      const prompt = !this.state.started
-        ? "Get 20 in a row to win!"
-        : "Press start to begin";
-      this.setState(
-        {
+      const prompt = !this.state.started ? "Get 20 in a row to win!" : "Press start to begin";
+      this.setState({
           count: 1,
+          started: true,
           userTurn: false,
           sequenceArr: [],
           prompt: prompt
-        },
-        () => {
+      }, () => {
           setTimeout(() => this.setState({ prompt: "" }), 3000);
         }
       );
@@ -149,16 +165,20 @@ export default class ControlPanel extends React.Component<{}, State> {
   };
 
   flashColorsOnReset = (): void => {
-    const colors = ["red", "green", "yellow", "blue"];
-    for (let i = 0; i < colors.length; i++) {
-      let color = colors[i];
-      this.simulateClick(document.getElementById(color), color);
+    for (let i = 0; i < ColorValues.length; i++) {
+      const color = ColorValues[i];
+      this.simulateClick(document.getElementById(color), color, true);
     }
   };
 
-  // toggle class to simulate a user click
-  simulateClick = (elem: HTMLElement | null, color: ColorType) => {
+  simulateClick = (elem: HTMLElement | null, color: ColorType, mute?: boolean | void) => {
+    console.warn('Simulate click', elem, color)
     if (elem) {
+      // play sound
+      if (!mute) {
+        let audioObj: HTMLAudioElement = new window.Audio(SoundMap[color]);
+        audioObj.play();
+      }
       elem.style.backgroundColor = ColorMap[color];
       setTimeout(() => {
         elem.style.backgroundColor = "";
@@ -166,7 +186,6 @@ export default class ControlPanel extends React.Component<{}, State> {
     } else {
       console.error('Failed to call simulate click on null element');
     }
-
   };
 
   /********************   GAME SIMULATION LOGIC   ********************/
@@ -181,20 +200,17 @@ export default class ControlPanel extends React.Component<{}, State> {
       // if replaying, reuse sequence, else add new color to end
       let sequence = replaying ? sequenceArr : sequenceArr.slice().concat(randomColor());
 
-      // for every color in sequence, play sound & simulate click
-      const iterateOverSequence = sequence => {
-        sequence.forEach(function(color, i) {
-          setTimeout(
-            function() {
+      // for every color in sequence, push a simulated click to call stack
+      const iterateOverSequence = (sequence) => {
+        sequence.forEach((color, i) => {
+          setTimeout(() => {
               let element: HTMLElement | null = document.getElementById(color);
-              let audioObj: HTMLAudioElement = new window.Audio(SoundMap[color]);
               this.simulateClick(element, color);
-              audioObj.play();
-            }.bind(this),
-            i * 700
-          );
-        }, this);
+            }, i * TURN_DELAY);
+        });
       };
+
+      
 
       const endingCallback = () => {
         iterateOverSequence(this.state.sequenceArr);
@@ -205,12 +221,7 @@ export default class ControlPanel extends React.Component<{}, State> {
         });
       };
 
-      this.setState(
-        {
-          sequenceArr: sequence
-        },
-        endingCallback
-      );
+      this.setState({sequenceArr: sequence}, endingCallback);
     }
   };
 
@@ -235,13 +246,15 @@ export default class ControlPanel extends React.Component<{}, State> {
 
             // reset state & start at one
             if (strictMode) {
-              this.resetBoard();
-              this.setState({
-                count: 0,
-                started: true,
-                prompt: "To prevent restarting, turn strict mode off"
+              this.resetBoard(() => {
+                this.setState({
+                  count: 0,
+                  started: true,
+                  prompt: "To prevent restarting, turn strict mode off"
+                }, () => {
+                  setTimeout(() => this.setState({ prompt: "" }), 5000);
+                });
               });
-              setTimeout(() => this.setState({ prompt: "" }), 5000);
             }
 
             // if strictMode off, turn on replaying, set user play to 0, and let computer move
