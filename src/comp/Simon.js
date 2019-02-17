@@ -1,18 +1,16 @@
 //@flow strict
 import * as React from "react";
-import { lighten } from 'polished';
+import { lighten } from "polished";
 import styled, { css } from "styled-components";
 
 // sounds associated with each of the colors. Used in handleUserMove
 const SoundMap: { [string]: string } = {
-  red: "https://s3.amazonaws.com/freecodecamp/simonSound1.mp3",
-  green: "https://s3.amazonaws.com/freecodecamp/simonSound2.mp3",
-  blue: "https://s3.amazonaws.com/freecodecamp/simonSound4.mp3",
-  yellow: "https://s3.amazonaws.com/freecodecamp/simonSound3.mp3",
-  correct:
-    "http://freesound.org/people/suntemple/sounds/253177/download/253177__suntemple__retro-accomplished-sfx.wav",
-  incorrect:
-    "https://freesound.org/people/myfox14/sounds/382310/download/382310__myfox14__game-over-arcade.wav"
+  red: require('./asset/red.mp3'),
+  green: require('./asset/green.mp3'),
+  blue: require('./asset/blue.mp3'),
+  yellow: require('./asset/yellow.mp3'),
+  correct: require('./asset/success.wav'),
+  incorrect: require('./asset/failure.wav')
 };
 
 const ColorMap = {
@@ -59,7 +57,7 @@ const log = (...args) => {
   if (DEBUG) {
     console.log(...args);
   }
-}
+};
 
 export default class Simon extends React.Component<{}, State> {
   state = {
@@ -93,7 +91,9 @@ export default class Simon extends React.Component<{}, State> {
 
     // check if computer's turn
     if (started && !userTurn && !gameOver) {
-      console.log(`Computer turn pushed to call stack with ${TURN_DELAY}ms delay`);
+      console.log(
+        `Computer turn pushed to call stack with ${TURN_DELAY}ms delay`
+      );
       setTimeout(this.computerTurn, TURN_DELAY);
     }
 
@@ -116,14 +116,18 @@ export default class Simon extends React.Component<{}, State> {
 
   toggleStart = () => {
     this.resetBoard(() => {
-      const prompt = !this.state.started ? "Get 20 in a row to win!" : "Press start to begin";
-      this.setState({
+      const prompt = !this.state.started
+        ? "Get 20 in a row to win!"
+        : "Press start to begin";
+      this.setState(
+        {
           count: 1,
           started: true,
           userTurn: false,
           sequenceArr: [],
           prompt: prompt
-      }, () => {
+        },
+        () => {
           setTimeout(() => this.setState({ prompt: "" }), 3000);
         }
       );
@@ -157,7 +161,9 @@ export default class Simon extends React.Component<{}, State> {
       },
       () => {
         // loop success sound
-        const gameWinSound: HTMLAudioElement = new window.Audio(SoundMap.correct);
+        const gameWinSound: HTMLAudioElement = new window.Audio(
+          SoundMap.correct
+        );
         gameWinSound.loop = true;
         gameWinSound.play();
         setTimeout(() => (gameWinSound.loop = false), 5000);
@@ -182,8 +188,12 @@ export default class Simon extends React.Component<{}, State> {
     }
   };
 
-  simulateClick = (elem: HTMLElement | null, color: ColorType, mute?: boolean | void) => {
-    console.warn('Simulate click', elem, color)
+  simulateClick = (
+    elem: HTMLElement | null,
+    color: ColorType,
+    mute?: boolean | void
+  ) => {
+    console.warn("Simulate click", elem, color);
     if (elem) {
       // play sound
       if (!mute) {
@@ -195,7 +205,7 @@ export default class Simon extends React.Component<{}, State> {
         elem.style.backgroundColor = "";
       }, 600);
     } else {
-      console.error('Failed to call simulate click on null element');
+      console.error("Failed to call simulate click on null element");
     }
   };
 
@@ -209,19 +219,19 @@ export default class Simon extends React.Component<{}, State> {
     if (count > sequenceArr.length || replaying) {
       const randomColor = () => ColorTypeKeys[Math.floor(Math.random() * 4)];
       // if replaying, reuse sequence, else add new color to end
-      let sequence = replaying ? sequenceArr : sequenceArr.slice().concat(randomColor());
+      let sequence = replaying
+        ? sequenceArr
+        : sequenceArr.slice().concat(randomColor());
 
       // for every color in sequence, push a simulated click to call stack
-      const iterateOverSequence = (sequence) => {
+      const iterateOverSequence = sequence => {
         sequence.forEach((color, i) => {
           setTimeout(() => {
-              let element: HTMLElement | null = document.getElementById(color);
-              this.simulateClick(element, color);
-            }, i * TURN_DELAY);
+            let element: HTMLElement | null = document.getElementById(color);
+            this.simulateClick(element, color);
+          }, i * TURN_DELAY);
         });
       };
-
-      
 
       const endingCallback = () => {
         iterateOverSequence(this.state.sequenceArr);
@@ -232,12 +242,12 @@ export default class Simon extends React.Component<{}, State> {
         });
       };
 
-      this.setState({sequenceArr: sequence}, endingCallback);
+      this.setState({ sequenceArr: sequence }, endingCallback);
     }
   };
 
   handleUserMove = (evt: SyntheticEvent<HTMLButtonElement>) => {
-    const { started, userTurn, sequenceArr, strictMode } = this.state;
+    const { started, userTurn, sequenceArr, strictMode, userPlay } = this.state;
     const t: HTMLButtonElement = evt.currentTarget; // https://flow.org/en/docs/react/events/
 
     if (started && userTurn) {
@@ -249,7 +259,7 @@ export default class Simon extends React.Component<{}, State> {
       audioObj.play();
 
       // if user toggles incorrectly
-      if (color !== sequenceArr[this.state.userPlay]) {
+      if (color !== sequenceArr[userPlay]) {
         let cnt = 0;
         const id = setInterval(() => {
           if (cnt === 2) {
@@ -259,12 +269,12 @@ export default class Simon extends React.Component<{}, State> {
             if (strictMode) {
               this.resetBoard(() => {
                 this.setState({
-                  count: 0,
-                  started: true,
-                  prompt: "To prevent restarting, turn strict mode off"
-                }, () => {
-                  setTimeout(() => this.setState({ prompt: "" }), 5000);
-                });
+                    count: 0,
+                    started: true,
+                    prompt: "To prevent restarting, turn strict mode off"
+                  }, () => {
+                    setTimeout(() => this.setState({ prompt: "" }), 5000);
+                  });
               });
             }
 
@@ -293,19 +303,18 @@ export default class Simon extends React.Component<{}, State> {
     }
   };
 
-
   /********************   UI LOGIC   ********************/
 
   // return the appropriate value to display to the user based on game state
   getDisplay = (): string => {
     const { started, gameOver, win, count } = this.state;
-    if (!started) return '--';
-    if (gameOver) return win ? 'win' : 'xx';
+    if (!started) return "--";
+    if (gameOver) return win ? "win" : "xx";
     return String(count);
-  }
+  };
 
   render() {
-    const { strictMode, prompt } = this.state;
+    const { strictMode, prompt, replaying, userTurn } = this.state;
 
     return (
       <MainContainer>
@@ -326,7 +335,13 @@ export default class Simon extends React.Component<{}, State> {
             </ControlButtons>
           </ScoreAndButtons>
           {ColorTypeKeys.map(t => (
-            <ColoredButton key={t} type={t} id={t} onClick={this.handleUserMove} />
+            <ColoredButton
+              key={t}
+              type={t}
+              id={t}
+              onClick={this.handleUserMove}
+              disabled={replaying || !userTurn}
+            />
           ))}
         </GameWrapper>
         <Prompt>{prompt}</Prompt>
@@ -458,7 +473,7 @@ const ColoredButton = styled.button`
           border-top-left-radius: 80%;
           background-color: ${ColorMap[props.type]};
           :active {
-            background-color:${ActiveColorMap[props.type]};
+            background-color: ${ActiveColorMap[props.type]};
             box-shadow: 0 2px #666;
             transform: translateY(1px);
           }
@@ -468,7 +483,7 @@ const ColoredButton = styled.button`
           border-top-right-radius: 80%;
           background-color: ${ColorMap[props.type]};
           :active {
-            background-color:${ActiveColorMap[props.type]};
+            background-color: ${ActiveColorMap[props.type]};
             box-shadow: 0 2px #666;
             transform: translateY(1px);
           }
@@ -478,7 +493,7 @@ const ColoredButton = styled.button`
           border-bottom-left-radius: 80%;
           background-color: ${ColorMap[props.type]};
           :active {
-            background-color:${ActiveColorMap[props.type]};
+            background-color: ${ActiveColorMap[props.type]};
             box-shadow: 0 2px #666;
             transform: translateY(1px);
           }
@@ -488,7 +503,7 @@ const ColoredButton = styled.button`
           border-bottom-right-radius: 80%;
           background-color: ${ColorMap[props.type]};
           :active {
-            background-color:${ActiveColorMap[props.type]};
+            background-color: ${ActiveColorMap[props.type]};
             box-shadow: 0 2px #666;
             transform: translateY(1px);
           }
