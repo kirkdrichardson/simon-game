@@ -1,11 +1,17 @@
 # Replica Simon Game
 
-- available as `cp.js` in `src/comp/`
+- available as `Simon.js` in `src/comp/`
 - includes a strict mode (resets after incorrect move)
 - 20 correct moves wins the game
 
+## tech
+- React, flow, styled components
+
+## running locally
+```
+cd {{projectRoot}}
+npm install
+npm start
+```
+
 ![Screenshot](./public/screenshot.PNG?raw=true "Project screenshot")
-
-
-
-This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
