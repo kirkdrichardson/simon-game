@@ -17,11 +17,11 @@ const SoundMap: { [string]: string } = {
 const ColorMap = {
   red: "#FF93A2",
   green: "#7EFF2D",
-  yellow: "#FFFCE0",
-  blue: "#7CD5FF"
+  blue: "#7CD5FF",
+  yellow: "#FFFCE0"
 };
 
-type ColorType = $Keys<ColorMap>;
+type ColorType = $Keys<typeof ColorMap>;
 
 const ColorValues: ColorType[] = Object.keys(ColorMap);
 
@@ -34,9 +34,11 @@ type State = {
   userTurn: boolean,
   sequenceArr: string[],
   userPlay: number,
-  replay: boolean,
+  replaying: boolean,
   prompt: string
 };
+
+const WIN_THRESHOLD: number = 5;
 
 export default class ControlPanel extends React.Component<{}, State> {
   state = {
@@ -48,7 +50,7 @@ export default class ControlPanel extends React.Component<{}, State> {
     userTurn: false,
     sequenceArr: [],
     userPlay: 0,
-    replay: false,
+    replaying: false,
     prompt: "Press start to begin"
   };
 
@@ -56,7 +58,7 @@ export default class ControlPanel extends React.Component<{}, State> {
     const { count, userPlay, gameOver, started, userTurn } = this.state;
 
     // user wins game if 20 steps completed
-    if (count === 21) {
+    if (count === WIN_THRESHOLD) {
       this.onGameWin();
     }
 
@@ -67,7 +69,7 @@ export default class ControlPanel extends React.Component<{}, State> {
 
     // modify count & play success sound if the user has played all colors in sequence & game not over
     if (count === userPlay && !gameOver) {
-      const successSound = new Audio(SoundMap.correct);
+      const successSound = new window.Audio(SoundMap.correct);
       successSound.play();
 
       this.setState({
@@ -103,7 +105,7 @@ export default class ControlPanel extends React.Component<{}, State> {
 
   /********************   GAME EVENT LOGIC   ********************/
 
-  resetBoard = (cb: () => void) => {
+  resetBoard = (cb?: () => void) => {
     this.setState(
       {
         count: 0,
@@ -111,7 +113,7 @@ export default class ControlPanel extends React.Component<{}, State> {
         userTurn: false,
         sequenceArr: [],
         userPlay: 0,
-        replay: false,
+        replaying: false,
         gameOver: false,
         prompt: "Press start to begin"
       },
@@ -128,7 +130,7 @@ export default class ControlPanel extends React.Component<{}, State> {
       },
       () => {
         // loop success sound
-        const gameWinSound: HTMLAudioElement = new Audio(SoundMap.correct);
+        const gameWinSound: HTMLAudioElement = new window.Audio(SoundMap.correct);
         gameWinSound.loop = true;
         gameWinSound.play();
         setTimeout(() => (gameWinSound.loop = false), 5000);
@@ -155,32 +157,37 @@ export default class ControlPanel extends React.Component<{}, State> {
   };
 
   // toggle class to simulate a user click
-  simulateClick = (elem: HTMLDivElement, color: ColorType) => {
-    elem.style.backgroundColor = ColorMap[color];
-    setTimeout(() => {
-      elem.style.backgroundColor = "";
-    }, 600);
+  simulateClick = (elem: HTMLElement | null, color: ColorType) => {
+    if (elem) {
+      elem.style.backgroundColor = ColorMap[color];
+      setTimeout(() => {
+        elem.style.backgroundColor = "";
+      }, 600);
+    } else {
+      console.error('Failed to call simulate click on null element');
+    }
+
   };
 
   /********************   GAME SIMULATION LOGIC   ********************/
 
   computerTurn = () => {
-    const { count, sequenceArr, replay } = this.state;
+    const { count, sequenceArr, replaying } = this.state;
 
     // only run if a single new color hasn't yet been added to the sequence
     // count will be updated after user moves correctly
-    if (count > sequenceArr.length || replay) {
+    if (count > sequenceArr.length || replaying) {
       const randomColor = () => ColorValues[Math.floor(Math.random() * 4)];
-      // if replay, reuse sequence, else add new color to end
-      let sequence = replay ? sequenceArr : sequenceArr.slice().concat(randomColor());
+      // if replaying, reuse sequence, else add new color to end
+      let sequence = replaying ? sequenceArr : sequenceArr.slice().concat(randomColor());
 
-      // for every color in sequnce, play sound & simulate click
+      // for every color in sequence, play sound & simulate click
       const iterateOverSequence = sequence => {
         sequence.forEach(function(color, i) {
           setTimeout(
             function() {
               let element: HTMLElement | null = document.getElementById(color);
-              let audioObj: HTMLAudioElement = new Audio(SoundMap[color]);
+              let audioObj: HTMLAudioElement = new window.Audio(SoundMap[color]);
               this.simulateClick(element, color);
               audioObj.play();
             }.bind(this),
@@ -193,7 +200,7 @@ export default class ControlPanel extends React.Component<{}, State> {
         iterateOverSequence(this.state.sequenceArr);
         this.setState({
           userPlay: 0,
-          replay: false,
+          replaying: false,
           userTurn: true
         });
       };
@@ -207,15 +214,16 @@ export default class ControlPanel extends React.Component<{}, State> {
     }
   };
 
-  handleUserMove = event => {
+  handleUserMove = (evt: SyntheticEvent<HTMLButtonElement>) => {
     const { started, userTurn, sequenceArr, strictMode } = this.state;
+    const t: HTMLButtonElement = evt.currentTarget; // https://flow.org/en/docs/react/events/
 
     if (started && userTurn) {
       // TODO - change to a non-DOM paradigm
       // play sound on button press
-      const color = event.target.id;
+      const color = t.id;
       // $FlowFixMe
-      const audioObj: HTMLAudioElement = new Audio(SoundMap[color]);
+      const audioObj: HTMLAudioElement = new window.Audio(SoundMap[color]);
       audioObj.play();
 
       // if user toggles incorrectly
@@ -236,10 +244,10 @@ export default class ControlPanel extends React.Component<{}, State> {
               setTimeout(() => this.setState({ prompt: "" }), 5000);
             }
 
-            // if strictMode off, turn on replay, set user play to 0, and let computer move
+            // if strictMode off, turn on replaying, set user play to 0, and let computer move
             else {
               this.setState({
-                replay: true,
+                replaying: true,
                 userPlay: 0,
                 userTurn: false
               });
@@ -247,7 +255,7 @@ export default class ControlPanel extends React.Component<{}, State> {
           } else {
             // flash colors & play failure sound in every case
             this.flashColorsOnReset();
-            const failureSound = new Audio(SoundMap.incorrect);
+            const failureSound = new window.Audio(SoundMap.incorrect);
             failureSound.play();
           }
 
@@ -273,7 +281,7 @@ export default class ControlPanel extends React.Component<{}, State> {
   }
 
   render() {
-    const { count, strictMode, prompt, started } = this.state;
+    const { strictMode, prompt } = this.state;
 
     return (
       <MainContainer>
@@ -293,8 +301,8 @@ export default class ControlPanel extends React.Component<{}, State> {
               </ControlButtonContainer>
             </ControlButtons>
           </ScoreAndButtons>
-          {["red", "green", "blue", "yellow"].map(t => (
-            <ColoredButton type={t} id={t} onClick={this.handleUserMove} />
+          {ColorValues.map(t => (
+            <ColoredButton key={t} type={t} id={t} onClick={this.handleUserMove} />
           ))}
         </GameWrapper>
         <Prompt>{prompt}</Prompt>
@@ -409,13 +417,15 @@ const ButtonIndicatorLight = styled.div`
   box-shadow: 1px 1px 1px #888888;
 `;
 
-const ColoredButton = styled.div`
+const ColoredButton = styled.button`
   height: 260px;
   width: 260px;
   padding: 0;
   overflow: hidden;
   position: relative;
   z-index: 1;
+  border: none;
+  outline: none;
 
   ${props => {
     switch (props.type) {
@@ -459,6 +469,7 @@ const ColoredButton = styled.div`
             transform: translateY(1px);
           }
         `;
+      default: // do nothing
     }
   }}
 `;
