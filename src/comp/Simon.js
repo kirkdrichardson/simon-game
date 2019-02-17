@@ -49,7 +49,7 @@ const log = (...args) => {
   }
 }
 
-export default class Game extends React.Component<{}, State> {
+export default class Simon extends React.Component<{}, State> {
   state = {
     count: 0,
     started: false,
@@ -82,8 +82,7 @@ export default class Game extends React.Component<{}, State> {
     // check if computer's turn
     if (started && !userTurn && !gameOver) {
       console.log(`Computer turn pushed to call stack with ${TURN_DELAY}ms delay`);
-      // setTimeout(this.computerTurn, TURN_DELAY);
-      this.computerTurn();
+      setTimeout(this.computerTurn, TURN_DELAY);
     }
 
     // modify count & play success sound if the user has played all colors in sequence & game not over

@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import ControlPanel from './comp/ControlPanel.js'
+import Simon from './comp/Simon.js'
 
 export default class App extends Component {
   render() {
     return (
       <Container>
-        <ControlPanel />
+        <Simon />
       </Container>
     );
   }
